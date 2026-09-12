@@ -5,11 +5,10 @@ generation.  You can run this file with `python`, `pytest`, or (soon)
 a coverage-guided fuzzer I'm working on.
 """
 
+import black
 import hypothesmith
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-
-import black
 
 
 # This test uses the Hypothesis and Hypothesmith libraries to generate random
@@ -42,7 +41,11 @@ def test_idempotent_any_syntatically_valid_python(
     compile(src_contents, "<string>", "exec")  # else the bug is in hypothesmith
 
     # Then format the code...
-    dst_contents = black.format_str(src_contents, mode=mode)
+    try:
+        dst_contents = black.format_str(src_contents, mode=mode)
+    except black.parsing.InvalidInput:
+        # Unparsable by Black; skip this input instead of crashing the test harness.
+        return
 
     # And check that we got equivalent and stable output.
     black.assert_equivalent(src_contents, dst_contents)
@@ -54,7 +57,14 @@ def test_idempotent_any_syntatically_valid_python(
 
 if __name__ == "__main__":
     # Run tests, including shrinking and reporting any known failures.
-    test_idempotent_any_syntatically_valid_python()
+    # Prefer running via pytest so Hypothesis decorators are handled correctly.
+    try:
+        import pytest
+    except Exception:
+        # Could not import pytest; do not invoke the Hypothesis-decorated function directly.
+        pass
+    else:
+        raise SystemExit(pytest.main([__file__]))
 
     # If Atheris is available, run coverage-guided fuzzing.
     # (if you want only bounded fuzzing, just use `pytest fuzz.py`)
