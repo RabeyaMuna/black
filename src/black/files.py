@@ -11,7 +11,7 @@ from mypy_extensions import mypyc_attr
 from packaging.specifiers import InvalidSpecifier, Specifier, SpecifierSet
 from packaging.version import InvalidVersion, Version
 from pathspec import PathSpec
-from pathspec.patterns.gitwildmatch import GitWildMatchPatternError
+from pathspec.patterns.gitignore import GitIgnorePatternError
 
 if sys.version_info >= (3, 11):
     try:
@@ -246,8 +246,8 @@ def get_gitignore(root: Path) -> PathSpec:
         with gitignore.open(encoding="utf-8") as gf:
             lines = gf.readlines()
     try:
-        return PathSpec.from_lines("gitwildmatch", lines)
-    except GitWildMatchPatternError as e:
+        return PathSpec.from_lines("gitignore", lines)
+    except GitIgnorePatternError as e:
         err(f"Could not parse {gitignore}: {e}")
         raise
 

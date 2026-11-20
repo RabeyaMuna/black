@@ -110,6 +110,13 @@ class FakeParameter(click.Parameter):
 
     def __init__(self) -> None:
         pass
+    def _parse_decls(
+        self, decls: Sequence[str], expose_value: bool
+    ) -> tuple[str, list[str], list[str]]:
+        return "", [], []
+
+    def add_to_parser(self, parser: Any, ctx: click.Context) -> None:
+        pass
 
 
 class BlackRunner(CliRunner):
@@ -2472,7 +2479,7 @@ class TestFileCollection:
         exclude = re.compile(r"")
         report = black.Report()
         gitignore = PathSpec.from_lines(
-            "gitwildmatch", ["exclude/", ".definitely_exclude"]
+            "gitignore", ["exclude/", ".definitely_exclude"]
         )
         sources: list[Path] = []
         expected = [
@@ -2647,7 +2654,7 @@ class TestFileCollection:
         include = re.compile(black.DEFAULT_INCLUDES)
         exclude = re.compile(black.DEFAULT_EXCLUDES)
         report = black.Report()
-        gitignore = PathSpec.from_lines("gitwildmatch", [])
+        gitignore = PathSpec.from_lines("gitignore", [])
 
         regular = MagicMock()
         regular.relative_to.return_value = Path("regular.py")

@@ -26,7 +26,7 @@ import click
 from click.core import ParameterSource
 from mypy_extensions import mypyc_attr
 from pathspec import PathSpec
-from pathspec.patterns.gitwildmatch import GitWildMatchPatternError
+from pathspec.patterns.gitignore import GitIgnorePatternError
 
 from _black_version import version as __version__
 from black.cache import Cache
@@ -678,7 +678,7 @@ def main(  # noqa: C901
                 report=report,
                 stdin_filename=stdin_filename,
             )
-        except GitWildMatchPatternError:
+        except GitIgnorePatternError:
             ctx.exit(1)
 
         path_empty(
